@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liquidador</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        text-align: center;
+        padding: 20px;
+      }
+
+      #header {
+        background-color: #4a90e2;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 30px;
+        margin-bottom: 30px;
+      }
+
+      .fase-box {
+        background-color: white;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .fase-box h2 {
+        color: #333;
+      }
+
+      .button {
+        background-color: #4a90e2;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 10px;
+        display: inline-block;
+        transition: background-color 0.3s;
+      }
+
+      .button:hover {
+        background-color: #357abd;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">Liquidador</div>
+    <div id="fase1" class="fase-box">
+      <h2>Fase 1</h2>
+      <a href="fase1.xlsx" download id="downloadFase1" class="button">Descargar Excel Fase 1</a>
+      <p id="counterFase1">0 descargas</p>
+    </div>
+
+    <div id="fase2" class="fase-box">
+      <h2>Fase 2</h2>
+      <a href="fase2.xlsx" download id="downloadFase2" class="button">Descargar Excel Fase 2</a>
+      <p id="counterFase2">0 descargas</p>
+    </div>
+
+    <script>
+      let countFase1 = 0;
+      let countFase2 = 0;
+
+      function setup() {
+        noCanvas();
+
+        // Contar clics de descarga para Fase 1
+        let fase1Button = select('#downloadFase1');
+        fase1Button.mousePressed(() => {
+          countFase1++;
+          updateCounter("Fase 1", countFase1);
+        });
+
+        // Contar clics de descarga para Fase 2
+        let fase2Button = select('#downloadFase2');
+        fase2Button.mousePressed(() => {
+          countFase2++;
+          updateCounter("Fase 2", countFase2);
+        });
+      }
+
+      // Actualizar contador de descargas
+      function updateCounter(fase, count) {
+        select(`#counter${fase}`).html(`${count} descargas`);
+      }
+    </script>
+  </body>
+</html>
