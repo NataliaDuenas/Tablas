@@ -69,28 +69,21 @@
       let countFase1 = 0;
       let countFase2 = 0;
 
-      function setup() {
-        noCanvas();
-
-        // Contar clics de descarga para Fase 1
-        let fase1Button = select('#downloadFase1');
-        fase1Button.mousePressed(() => {
-          countFase1++;
-          updateCounter("Fase 1", countFase1);
-        });
-
-        // Contar clics de descarga para Fase 2
-        let fase2Button = select('#downloadFase2');
-        fase2Button.mousePressed(() => {
-          countFase2++;
-          updateCounter("Fase 2", countFase2);
-        });
-      }
-
-      // Actualizar contador de descargas
+      // Función para actualizar el contador de descargas
       function updateCounter(fase, count) {
-        select(`#counter${fase}`).html(`${count} descargas`);
+        document.getElementById(`counter${fase}`).textContent = `${count} descargas`;
       }
+
+      // Escuchar clics en los enlaces de descarga
+      document.getElementById('downloadFase1').addEventListener('click', function() {
+        countFase1++;
+        updateCounter('Fase1', countFase1);
+      });
+
+      document.getElementById('downloadFase2').addEventListener('click', function() {
+        countFase2++;
+        updateCounter('Fase2', countFase2);
+      });
     </script>
   </body>
 </html>
