@@ -1,89 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Liquidador</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        text-align: center;
-        padding: 20px;
-      }
+<head>
+  <meta charset="UTF-8">
+  <title>Lector de Códigos por Carpeta</title>
+  <script type="module">
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
 
-      #header {
-        background-color: #4a90e2;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 30px;
-        margin-bottom: 30px;
-      }
+    document.addEventListener('DOMContentLoaded', () => {
+      const fileInput = document.getElementById('fileInput');
+      const outputText = document.getElementById('output');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const reader = new BrowserMultiFormatReader();
 
-      .fase-box {
-        background-color: white;
-        margin: 20px auto;
-        padding: 20px;
-        border-radius: 10px;
-        width: 80%;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+      let resultados = [];
 
-      .fase-box h2 {
-        color: #333;
-      }
+      fileInput.addEventListener('change', async (event) => {
+        resultados = [];
+        outputText.textContent = "Procesando imágenes...\n";
 
-      .button {
-        background-color: #4a90e2;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        margin-top: 10px;
-        display: inline-block;
-        transition: background-color 0.3s;
-      }
+        const files = Array.from(event.target.files).filter(file =>
+          /\.(jpe?g|png)$/i.test(file.name)
+        );
 
-      .button:hover {
-        background-color: #357abd;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="header">Liquidador</div>
-    <div id="fase1" class="fase-box">
-      <h2>Fase 1</h2>
-      <a href="1 FASE INDEXACION MORATORIOS CCA.xlsx" download id="downloadFase1" class="button">Descargar Excel Fase 1</a>
-      <p id="counterFase1">0 descargas</p>
-    </div>
+        for (const file of files) {
+          const imgURL = URL.createObjectURL(file);
+          const img = new Image();
+          img.src = imgURL;
 
-    <div id="fase2" class="fase-box">
-      <h2>Fase 2</h2>
-      <a href="2 FASE INDEXACION MORATORIOS CPACA.xlsx" download id="downloadFase2" class="button">Descargar Excel Fase 2</a>
-      <p id="counterFase2">0 descargas</p>
-    </div>
+          await new Promise((resolve) => {
+            img.onload = async () => {
+              try {
+                const result = await reader.decodeFromImageElement(img);
+                const linea = `${file.name}: ${result.text}`;
+                resultados.push(linea);
+                outputText.textContent += linea + '\n';
+              } catch (err) {
+                const linea = `${file.name}: (sin código leído)`;
+                resultados.push(linea);
+                outputText.textContent += linea + '\n';
+              }
+              resolve();
+            };
+          });
 
-    <script>
-      let countFase1 = 0;
-      let countFase2 = 0;
+          URL.revokeObjectURL(imgURL);
+        }
 
-      // Función para actualizar el contador de descargas
-      function updateCounter(fase, count) {
-        document.getElementById(`counter${fase}`).textContent = `${count} descargas`;
-      }
-
-      // Escuchar clics en los enlaces de descarga
-      document.getElementById('downloadFase1').addEventListener('click', function() {
-        countFase1++;
-        updateCounter('Fase1', countFase1);
+        downloadBtn.style.display = 'inline-block';
       });
 
-      document.getElementById('downloadFase2').addEventListener('click', function() {
-        countFase2++;
-        updateCounter('Fase2', countFase2);
+      downloadBtn.addEventListener('click', () => {
+        const blob = new Blob([resultados.join('\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'codigos_leidos.txt';
+        a.click();
+
+        URL.revokeObjectURL(url);
       });
-    </script>
-  </body>
+    });
+  </script>
+</head>
+<body>
+  <h2>🧾 Lector de códigos desde imágenes (sube una carpeta)</h2>
+  <input type="file" id="fileInput" webkitdirectory multiple>
+  <pre id="output" style="background:#f0f0f0; padding:1em; height:300px; overflow:auto;"></pre>
+  <button id="downloadBtn" style="display:none;">📥 Descargar resultados</button>
+</body>
 </html>
